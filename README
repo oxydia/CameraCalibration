@@ -1,0 +1,24 @@
+Camera Calibration
+December 2011
+
+Holy RAZAFINJOELINA
+Alexandre MAHE
+
+Ecole d'Ingénieurs IMAC (promo 2013)
+
+
+--------
+
+TODO :
+- Résoudre les erreurs de compilation
+- 
+
+--------
+
+HOW TO COMPILE
+'make fresh' in CameraCalibration directory
+'make'
+
+HOW TO USE
+'./cameraCalibration help'
+'./cameraCalibration path/img1.jpg path/img2.jpg'
