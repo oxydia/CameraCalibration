@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 #include "Image.hpp"
+#include "Print.hpp"
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
@@ -49,20 +50,27 @@ int main(int argc, char** argv) {
 	// For executing commands in shell.
 	int iNumProc = 0, iChildiStatus = 0, iStatus = 0, iDeadId = 0, iExitFlag = 0;
 	// For stocking the images.
-	Image imgs[nbImages];
+	Image* imgs = new Image[nbImages]();
 	
 	// Create the images and load pictures.
 	for(size_t i = 0; i < nbImages; ++i) {
 		stringstream imgCommand;
-		imgs[i].path = (char*)argv[i+1];
-		imgs[i].loadJPG();
+		imgs[i].id = i;
+		imgs[i].path = argv[i+1];
+		try {
+			imgs[i].loadJPG();
+		} catch(...) {
+			cerr << "Unable to load the file at " << imgs[i].path << endl;
+			cerr << "Aborting." << endl;
+			exit(EXIT_FAILURE);
+		}
 		// assert on a property of the image (like dimensions)
 		imgCommand << POINTLISTEXPORTER << " " << imgs[i].path;
 		iStatus = runCommand(imgCommand.str().c_str());
 		if (!iStatus)
 			iNumProc++;
 	}
-	cout << "Are you done selecting the points you want to see in this world ?" << endl;
+	cout << "Press ESC when you are done selecting the points." << endl;
 
 	// Wait till the commands complete
 	while (iNumProc && !iExitFlag)
@@ -75,21 +83,30 @@ int main(int argc, char** argv) {
 		else
 			sleep(3);
 	}
+	cout << "Computing results..." << endl;
 	
 	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < nbImages; ++i) {
+		Image &img = imgs[i];
 		// The points are selected so we can load 'em
-		imgs[i].loadPoints();
-		// Wanna use b in the main ? Well imgs[i].getB(). @TODO : Assert it.
+		img.loadPoints();
+		cout << "Image " << img.id << " - Points vectors : " << endl;
+		for(size_t vi = 0; vi < img.points.size(); ++vi)
+			printVector(img.points[vi], true);
+		cout << endl;
 		// Make the camera
-		imgs[i].setCamera();
+		img.setCamera();
+		cout << "Image " << img.id << " - Camera - Intrinsec parameters : " << endl;
+		printMatrix(img.camera->intrinsecParameters());
+		cout << endl;
 		// @TODO : Insert strange parameters and compute 'em.
 		
 	}
 	
-	// @TODO : Change this.
-	cout << "That's how it's done, bitch." << endl;
-	// Load images then display them.
+	// Build an image
 	
-	return EXIT_SUCCESS;
+	cout << "That's done." << endl;
+	
+	// Print coordinates
+	
 }

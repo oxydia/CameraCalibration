@@ -1,50 +1,53 @@
 #ifndef _CAMERA_HPP_
 #define _CAMERA_HPP_
 
-
+#include "Print.hpp"
 #include <cstdlib>
 #include <cmath>
 #include <OpenKN/math/Vector.hpp>
 // @TODO : Need to figure out how to use Matrix3x3d
-#include <OpenKN/math/Matrix.hpp>
+#include <OpenKN/math/Matrix3x3.hpp>
 // @TODO : Need to add debug code
 #include <cassert>
+#include <iostream>
 #include <exception>
 
 class Camera {
 private :
+	const size_t m_Id;
 	const size_t m_Height;
 	const size_t m_Width;
-	const double m_Focale;
-	kn::Vector<double> m_Center;
-	//kn::Matrix<double, 3, 3> m_IntrasecParameters;
-	//Matrix3x3d m_ExtrasecParameters;
-	//Matrix3x3d m_Rotation;
+	const float m_Focale;
+	kn::Matrix3x3d m_IntrinsecParameters;
+	kn::Matrix3x3d m_Rotation;
+	kn::Vector3d m_Center;
+	kn::Matrix<double> m_Projection;
 	
+	void _setIntrinsecParameters();
+
 public :
-	Camera(size_t height, size_t width)
-		: 	m_Height(height), m_Width(width), m_Focale(sqrt(pow(m_Width, 2) + pow(m_Height, 2))),
-			m_Center(double(m_Width/2.), double(m_Height/2.), 1.)
-		{
-		
-	}
-	~Camera() {}
+	Camera(size_t id, size_t height, size_t width);
+	~Camera();
 	
-	double focale() const {
+	void printIntrinsecParameters() const;
+	
+	// Getters
+	inline const float focale() const {
 		return m_Focale;
 	}
-	
-	size_t height() const {
+	inline const size_t height() const {
 		return m_Height;
 	}
-	
-	size_t width() const {
+	inline const size_t width() const {
 		return m_Width;
 	}
-	
-	kn::Vector<double> center() const {
+	inline const kn::Matrix3x3d intrinsecParameters() const {
+		return m_IntrinsecParameters;
+	}
+	inline const kn::Vector3d center() const {
 		return m_Center;
 	}
+	
 };
 
 #endif // _CAMERA_HPP_
