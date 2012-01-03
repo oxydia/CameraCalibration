@@ -51,57 +51,78 @@ int main(int argc, char** argv) {
 	int iNumProc = 0, iChildiStatus = 0, iStatus = 0, iDeadId = 0, iExitFlag = 0;
 	// For stocking the images.
 	Image* imgs = new Image[nbImages]();
-	
-	// Create the images and load pictures.
-	for(size_t i = 0; i < nbImages; ++i) {
-		stringstream imgCommand;
-		imgs[i].id = i;
-		imgs[i].path = argv[i+1];
-		try {
-			imgs[i].loadJPG();
-		} catch(...) {
-			cerr << "Unable to load the file at " << imgs[i].path << endl;
-			cerr << "Aborting." << endl;
-			exit(EXIT_FAILURE);
+	// If points are not set yet.
+	if(true){
+		// Create the images and load pictures.
+		for(size_t i = 0; i < nbImages; ++i) {
+			stringstream imgCommand;;
+			imgs[i].path = argv[i+1];
+			try {
+				imgs[i].loadJPG();
+			} catch(...) {
+				cerr << "Unable to load the file at " << imgs[i].path << endl;
+				cerr << "Aborting." << endl;
+				exit(EXIT_FAILURE);
+			}
+			// assert on a property of the image (like dimensions)
+			imgCommand << POINTLISTEXPORTER << " " << imgs[i].path;
+			iStatus = runCommand(imgCommand.str().c_str());
+			if (!iStatus)
+				iNumProc++;
 		}
-		// assert on a property of the image (like dimensions)
-		imgCommand << POINTLISTEXPORTER << " " << imgs[i].path;
-		iStatus = runCommand(imgCommand.str().c_str());
-		if (!iStatus)
-			iNumProc++;
-	}
-	cout << "Press ESC when you are done selecting the points." << endl;
+		cout << "Press ESC when you are done selecting the points." << endl;
 
-	// Wait till the commands complete
-	while (iNumProc && !iExitFlag)
-	{
-		iDeadId = waitpid(-1, &iChildiStatus, WNOHANG);
-		if (iDeadId < 0)
-			iExitFlag = 1;
-		else if (iDeadId > 0)
-			--iNumProc;
-		else
-			sleep(3);
+		// Wait till the commands complete
+		while (iNumProc && !iExitFlag)
+		{
+			iDeadId = waitpid(-1, &iChildiStatus, WNOHANG);
+			if (iDeadId < 0)
+				iExitFlag = 1;
+			else if (iDeadId > 0)
+				--iNumProc;
+			else
+				sleep(3);
+		}
 	}
 	cout << "Computing results..." << endl;
 	
 	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < nbImages; ++i) {
 		Image &img = imgs[i];
+		
 		// The points are selected so we can load 'em
 		img.loadPoints();
-		cout << "Image " << img.id << " - Points vectors : " << endl;
+		// PRINT
+		cout << "Image " << i+1 << " - Points vectors : " << endl;
 		for(size_t vi = 0; vi < img.points.size(); ++vi)
 			printVector(img.points[vi], true);
 		cout << endl;
-		// Make the camera
-		img.setCamera();
-		cout << "Image " << img.id << " - Camera - Intrinsec parameters : " << endl;
-		printMatrix(img.camera->intrinsecParameters());
-		cout << endl;
-		// @TODO : Insert strange parameters and compute 'em.
 		
+		// Make camera
+		img.setCamera();
+		// Arbitrarly force the position
+		img.pCamera->position[0] = (double)i;
+		
+		// Camera's intrinsec parameters
+		img.pCamera->computeIntrinsecParameters();
+		// PRINT
+		cout << "Image " << i+1 << " - Camera - Intrinsec parameters : " << endl;
+		printMatrix(img.pCamera->intrinsecParameters);
+		cout << endl;
+		
+		// The homography is used for finding a rotation
+		img.homography = img.resolveHomography();
+		// PRINT
+		cout << "Image " << i+1 << " - Theorical Homography : " << endl;
+		printMatrix(img.homography);
+		cout << endl;
+		
+		// Make a fake camera for describing camera projection ?
+		
+		// @TODO : Insert strange parameters and compute 'em.
 	}
+	
+	// Now we need to create fake cameras.
 	
 	// Build an image
 	

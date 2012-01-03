@@ -1,9 +1,9 @@
 GXX = g++
-FLAGS = -Wall -g
+FLAGS = -Wall -g -lOpenKN-math -lOpenKN-image -lglut -lGLU -lGLEW -L. -I. -O2
 SRCDIR = src
 EXE = cameraCalibration
 
-$(EXE): $(SRCDIR)/main.cpp $(SRCDIR)/Image.hpp $(SRCDIR)/Camera.hpp
+$(EXE): $(SRCDIR)/*.cpp
 	@$(GXX) $^ -o $(EXE) $(FLAGS)
 	@echo "Executable generated successfully."
 	@echo "Wanna launch it ? Just type './cameraCalibration path/img0.jpg path/img1.jpg'."

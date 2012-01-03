@@ -4,6 +4,7 @@
 // @TODO : Resolve compilations errors
 #include "Camera.hpp"
 #include <sstream>
+#include <vector>
 #include <OpenKN/image/ImageRGB.hpp>
 #include <OpenKN/image/ioJPG.hpp>
 #include <OpenKN/math/Vector.hpp>
@@ -18,13 +19,17 @@ struct Image {
 	char* path;
 	kn::ImageRGB8u image;
 	std::vector< kn::Vector3d > points;
-	Camera* camera;
+	Camera* pCamera;
+	Camera* pFakeCamera;
+	kn::Matrix3x3d homography;
 	
 	void loadJPG();
 	void loadPoints();
-	std::vector<double> getB();
-	// making camera. The constructor of camera take it from there.
 	void setCamera();
+	
+	kn::Matrix3x3d resolveHomography();
+	
+	std::vector<double> getB();
 	Image();
 	// Destructor
 	~Image();
