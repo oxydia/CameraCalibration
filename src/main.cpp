@@ -125,20 +125,19 @@ int main(int argc, char** argv) {
 	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < imgs.size(); ++i) {
 		Image &img = *imgs[i];
-		
 		// The points are selected so we can load 'em
 		img.loadPoints();
+		
 		// We make sure every image has the same number of points.
 		if(nbPoints == 0)
 			nbPoints = img.points.size();
 		if(!nbPoints || img.points.size() != nbPoints)
-			throw "no a good number of points"; exit(EXIT_FAILURE);
+			throw "not a good number of points"; exit(EXIT_FAILURE);
 		// PRINT
 		cout << "Image " << i+1 << " - Points vectors : " << endl;
 		for(size_t vi = 0; vi < img.points.size(); ++vi)
 			printVector(img.points[vi], true);
 		cout << endl;
-		
 		
 		// Make camera
 		img.setCamera();
@@ -160,29 +159,29 @@ int main(int argc, char** argv) {
 	}
 	
 	kn::Vector<double> a(imgs.size() * 3);
-	kn::Vector<double> b(4 + imgs.size()*3*nbPoints);
+	kn::Vector<double> b(4 + 2*imgs.size()*nbPoints);
 	// Every image must have the same resolution, same center (x0, y0), same focale
 	b[0] = imgs[0]->image.width();
 	b[1] = imgs[0]->image.height();
 	b[2] = imgs[0]->pCamera->focale;
 	b[3] = nbPoints;
-	for(size_t i = 0 ; i < imgs.size(); ++i)
-		for(size_t j = 0 ; j < nbPoints; ++j)
-			for(size_t c = 0; c < 3 ; ++c)
-				b[4+i*nbPoints+j*3+c] = imgs[i]->points[j][c];
+	for(size_t j = 0 ; j < nbPoints; ++j)
+		for(size_t i = 0 ; i < imgs.size(); ++i)
+			for(size_t c = 0; c < 2 ; ++c)
+				b[4+i*(imgs.size()*2)+j*2+c] = imgs[i]->points[j][c];
 	// nonLinearSystemSolver(a, b(), &f(), NB_MAX_ITERATIONS);
 	
 	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < imgs.size(); ++i) {
 		Image &img = *imgs[i];
-		kn::Matrix3x3d rotation;// = img.resolveRotationEuler(kn::Vector3d(a[i*3], a[i*3+1], a[i*3+2]));
+		kn::Matrix3x3d rotation = kn::eulerAngles3x3d(a[i*3], a[i*3+1], a[i*3+2]);
 		// PRINT
 		cout << "Image " << i+1 << " - Camera - Found anti-rotation parameter : " << endl;
 		printMatrix(rotation);
 		cout << endl;
 		
 		// We inverse this rotation using SVD
-		img.pCamera->rotation = inverseMatrixSVD(rotation);
+		img.pCamera->rotation = kn::inverseMatrixSVD(rotation);
 		// PRINT
 		cout << "Image " << i+1 << " - Camera - Rotation parameter : " << endl;
 		printMatrix(img.pCamera->rotation);
@@ -209,9 +208,9 @@ int main(int argc, char** argv) {
 	}
 	cout << endl;
 	
-	// Build an image
+	// Export a list of points.
+	
+	// What to add ? Build a 3D image
 	
 	cout << "That's done." << endl;
-	
-	// Print coordinates	
 }

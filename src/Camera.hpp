@@ -7,7 +7,7 @@
 #include <OpenKN/math/Vector.hpp>
 #include <OpenKN/math/Matrix3x3.hpp>
 #include <OpenKN/math/InverseMatrix.hpp>
-// @TODO : Need to add debug code
+#include <OpenKN/math/EulerAngles.hpp>
 #include <cassert>
 #include <iostream>
 #include <exception>
@@ -24,6 +24,7 @@ struct Camera {
 	
 	virtual kn::Matrix3x3d computeIntrinsecParameters();
 	virtual kn::Matrix3x3d homography();
+	virtual kn::Matrix3x3d computeHomographyFromRotation(const kn::Matrix3x3d & rot);
 	
 	// We can add here functions for computing other Camera's attributes
 	// Constructor & Destructor

@@ -29,8 +29,12 @@ Matrix3x3d Camera::computeIntrinsecParameters() {
 }
 	
 Matrix3x3d Camera::homography() {
+	return computeHomographyFromRotation(rotation);
+}
+
+Matrix3x3d Camera::computeHomographyFromRotation(const Matrix3x3d & rot) {
 	Matrix3x3d homography = intrinsecParameters;
-	homography *= rotation;
+	homography *= rot;
 	homography *= inverseMatrixGaussianElimination(intrinsecParameters);
 	return homography;
 }

@@ -12,18 +12,22 @@
 void nonLinearSystemSolver(
 	kn::Vector<double> &a,
 	const kn::Vector<double> &b,
-	double (*costFunctionPtr)(const kn::Vector<double>&,
-	const kn::Vector<double>&),
-	const size_t nbMaxIterations);
+	double (*costFunctionPtr)(const kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> & imgs),
+	const size_t nbMaxIterations,
+	const std::vector<Image*> & imgs);
 
 double _nonLinearSystemSolverSVD(
 	kn::Vector<double> &a, const kn::Vector<double> &b,
-	double (*costFunctionPtr)(const kn::Vector<double>&, const kn::Vector<double>&),
-	kn::Matrix<double> & j);
+	double (*pF)(const kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> &),
+	kn::Matrix<double> & j,
+	const std::vector<Image*> & imgs);
 
 kn::Vector<double> _nonLinearSystemSolverJacobian(
 	const kn::Vector<double> &a, const kn::Vector<double> &b,
-	double (*costFunctionPtr)(const kn::Vector<double>&, const kn::Vector<double>&));
+	double (*pF)(const kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> &),
+	const std::vector<Image*> & imgs);
+
+double f(kn::Vector<double> & a, const kn::Vector<double> & b, const std::vector<Image*> & imgs);
 
 kn::Vector3d resolvePointTriangulation(const size_t iPoint, const std::vector<Image*> & imgs);
 
