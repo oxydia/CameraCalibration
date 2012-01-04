@@ -30,48 +30,71 @@ int runCommand(const char *strCommand)
 
 // main
 int main(int argc, char** argv) {
+	// command : cameraCalibration -i p0.jpg p1.jpg -p p0.list p1.list
 	cout << endl << "- Camera calibration. -" << endl << "Holy Razafinjoelina & Alexandre Mahé" << endl;
 	cout << endl << "=============================" << endl << endl;
-	size_t nbImages = argc-1;
 	
-	if(nbImages <= 1) {
+	if(argc <= 1) {
 		// Not enough args, show the help.
 		cout << "-= Help =-" << endl;
 		cout << "This application is used to caliber multiple cameras using photographies." << endl;
 		cout << "When launching this application, append the name of the application by the paths of two or more images." << endl;
 		cout << "Ex: ./cameraCalibration photo1.jpg photo2.jpg" << endl << endl;
-		cout << "Then, you will have to select the points on your images and close the selector." << endl;
+		cout << "Then, you will have to select 6 points on your images and close the selector." << endl;
 		cout << "Commands for the selector :" << endl;
 		cout << "\tf : Fullscreen" << endl;
 		cout << "\tescape : Quit and save points in a file." << endl;
 		exit(EXIT_SUCCESS);
 	}
 	// else
-	// For executing commands in shell.
-	int iNumProc = 0, iChildiStatus = 0, iStatus = 0, iDeadId = 0, iExitFlag = 0;
 	// For stocking the images.
-	Image* imgs = new Image[nbImages]();
-	// If points are not set yet.
-	if(true){
-		// Create the images and load pictures.
-		for(size_t i = 0; i < nbImages; ++i) {
-			stringstream imgCommand;;
-			imgs[i].path = argv[i+1];
+	std::vector<Image*> imgs;
+	size_t iArg = 1;
+	if(!((string)argv[iArg]).compare("-i")) {
+		++iArg;
+		const int j(iArg);
+		while(argv[iArg] && ((string)argv[iArg]).compare("-p")) {
+			imgs.push_back(new Image());
+			imgs[iArg-j]->path = (string)argv[iArg];
 			try {
-				imgs[i].loadJPG();
+				imgs[iArg-j]->loadJPG();
 			} catch(...) {
-				cerr << "Unable to load the file at " << imgs[i].path << endl;
+				cerr << "Unable to load the file at " << imgs[iArg-j]->path << endl;
 				cerr << "Aborting." << endl;
 				exit(EXIT_FAILURE);
 			}
+			++iArg;
+		}
+	} else {
+		throw "no args !";
+		exit(EXIT_FAILURE);
+	}
+	
+	// If pointlists paths are set in the application command line
+	if(!!argv[iArg] && !((string)argv[iArg]).compare("-p")) {
+		++iArg;
+		const int j(iArg);
+		while(argv[iArg]) {
+			imgs[iArg-j]->pointlistPath = (string)argv[iArg];
+			++iArg;
+		}
+		if(iArg-j != imgs.size())
+			throw "Not enough points files";
+	}
+	// If not
+	else {
+		// For executing commands in shell.
+		int iNumProc = 0, iChildiStatus = 0, iStatus = 0, iDeadId = 0, iExitFlag = 0;
+		for(size_t i = 0; i < imgs.size(); ++i) {
+			stringstream imgCommand;
 			// assert on a property of the image (like dimensions)
-			imgCommand << POINTLISTEXPORTER << " " << imgs[i].path;
+			imgCommand << POINTLISTEXPORTER << " " << imgs[i]->path;
 			iStatus = runCommand(imgCommand.str().c_str());
 			if (!iStatus)
 				iNumProc++;
 		}
-		cout << "Press ESC when you are done selecting the points." << endl;
-
+		cout << "Press ESC when you are done selecting the 6 points." << endl;
+		
 		// Wait till the commands complete
 		while (iNumProc && !iExitFlag)
 		{
@@ -83,12 +106,19 @@ int main(int argc, char** argv) {
 			else
 				sleep(3);
 		}
+		
+		for(size_t i = 0; i < imgs.size(); ++i) {		
+			std::stringstream pointsFilename;
+			pointsFilename << imgs[i]->path << ".list";
+			imgs[i]->pointlistPath = pointsFilename.str();
+		}
 	}
+	
 	cout << "Computing results..." << endl;
 	
 	// Now user configuration is done, we can compute data for every image.
-	for(size_t i = 0; i < nbImages; ++i) {
-		Image &img = imgs[i];
+	for(size_t i = 0; i < imgs.size(); ++i) {
+		Image &img = *imgs[i];
 		
 		// The points are selected so we can load 'em
 		img.loadPoints();
@@ -130,4 +160,7 @@ int main(int argc, char** argv) {
 	
 	// Print coordinates
 	
+	//	Delete ALL the cameras !
+	//	for(size_t i = 0; i < imgs.size(); ++i)
+	//		delete imgs[i];
 }

@@ -7,6 +7,8 @@ void nonLinearSystemSolver(
 	double (*costFunctionPtr)(const kn::Vector<double>&,
 	const kn::Vector<double>&),
 	const unsigned int nbMaxIterations)
-{}
+{
+
+}
 
 #endif // _MATHS_HPP_

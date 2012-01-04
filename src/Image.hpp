@@ -11,12 +11,14 @@
 #include <OpenKN/math/MathIO.hpp>
 // @TODO : Need to add debug code
 #include <cassert>
+#include <string>
 #include <exception>
 
 // Will stock our results and manage space.
 struct Image {
 	size_t id;
-	char* path;
+	std::string path;
+	std::string pointlistPath;
 	kn::ImageRGB8u image;
 	std::vector< kn::Vector3d > points;
 	Camera* pCamera;

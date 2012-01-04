@@ -3,11 +3,10 @@
 using namespace std;
 
 Image::Image() :
-	path(NULL), image(), points()
+	path(),pointlistPath(), image(), points()
 {}
 
 Image::~Image() {
-	delete [] path;
 	delete [] pCamera;
 	delete [] pFakeCamera;
 }
@@ -17,9 +16,10 @@ void Image::loadJPG() {
 }
 
 void Image::loadPoints() {
-	std::stringstream pointsFilename;
-	pointsFilename << path << ".list";
-	kn::loadVectorList(points, pointsFilename.str());
+	if(pointlistPath == "") {
+		throw "no pointlist path !";
+	}
+	kn::loadVectorList(points, pointlistPath);
 }
 
 void Image::setCamera() {
