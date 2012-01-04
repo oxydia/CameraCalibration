@@ -21,6 +21,7 @@ struct Image {
 	std::string pointlistPath;
 	kn::ImageRGB8u image;
 	std::vector< kn::Vector3d > points;
+	kn::Vector<double> a;
 	Camera* pCamera;
 	Camera* pFakeCamera;
 	kn::Matrix3x3d homography;
@@ -31,7 +32,9 @@ struct Image {
 	
 	kn::Matrix3x3d resolveHomography();
 	
-	std::vector<double> getB();
+	kn::Vector<double> b();
+	double f();
+	
 	Image();
 	// Destructor
 	~Image();

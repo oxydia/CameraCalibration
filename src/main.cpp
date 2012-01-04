@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 #include "Image.hpp"
 #include "Print.hpp"
+#include "Maths.hpp"
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
@@ -27,6 +28,8 @@ int runCommand(const char *strCommand)
 		iStatus = (iForkId > 0) ? 0 : -1;
 	return(iStatus);
 }
+
+const static int NB_MAX_ITERATIONS = 20;
 
 // main
 int main(int argc, char** argv) {
@@ -149,6 +152,8 @@ int main(int argc, char** argv) {
 		printMatrix(img.homography);
 		cout << endl;
 		
+		//
+		nonLinearSystemSolver(img.a, img.b(), &img.f(), NB_MAX_ITERATIONS); 
 		// Make a fake camera for describing camera projection ?
 		
 		// @TODO : Insert strange parameters and compute 'em.

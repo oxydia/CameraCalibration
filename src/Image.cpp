@@ -1,7 +1,5 @@
 #include "Image.hpp"
 
-using namespace std;
-
 Image::Image() :
 	path(),pointlistPath(), image(), points()
 {}
@@ -35,25 +33,24 @@ kn::Matrix3x3d Image::resolveHomography() {
 	return pCamera->computeHomography(rotX * rotY * rotZ);
 }
 
-/*vector<double> Image::getA() {
-	
-	return;
-}*/
+double Image::f() {
+	return 1.;
+}
 
 
-vector<double> Image::getB() {
+kn::Vector<double> Image::b() {
 	if(points.size() == 0) {
 		throw "no points";
 		exit(1);
 	}
-	vector<double> b;
-	b.push_back(image.width());
-	b.push_back(image.height());
-	b.push_back(pCamera->focale);
-	b.push_back(points.size());
-	for(size_t i = 0; i < points.size(); ++i)
-		for(size_t c = 0; c < 3 ; ++i)
-			b.push_back(points[i][c]);
+	kn::Vector<double> b(4 + 3*points.size());
+	b[0] = image.width();
+	b[1] = image.height();
+	b[2] = pCamera->focale;
+	b[3] = points.size();
+	for(size_t i = 0 ; i < points.size(); ++i)
+		for(size_t c = 0; c < 3 ; ++c)
+			b[4+i*3+c] = points[i][c];
 	// @TODO : Make vector b.
 	return b;
 }
