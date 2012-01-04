@@ -169,7 +169,7 @@ int main(int argc, char** argv) {
 		for(size_t i = 0 ; i < imgs.size(); ++i)
 			for(size_t c = 0; c < 2 ; ++c)
 				b[4+i*(imgs.size()*2)+j*2+c] = imgs[i]->points[j][c];
-	// nonLinearSystemSolver(a, b(), &f(), NB_MAX_ITERATIONS);
+	// nonLinearSystemSolver(a, b(), &f(), NB_MAX_ITERATIONS, imgs);
 	
 	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < imgs.size(); ++i) {
