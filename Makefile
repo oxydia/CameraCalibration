@@ -6,8 +6,7 @@ EXE = cameraCalibration
 $(EXE): $(SRCDIR)/*.cpp
 	@$(GXX) $^ -o $(EXE) $(FLAGS)
 	@echo "Executable generated successfully."
-	@echo "Wanna launch it ? Just type './cameraCalibration path/img0.jpg path/img1.jpg'."
-	@echo "Type './cameraCalibration help' for help."
+	@echo "Wanna launch it ? Just type './cameraCalibration' without argument for help."
     
 .PHONY : clean ultraclean fresh
 

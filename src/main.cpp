@@ -38,9 +38,11 @@ int main(int argc, char** argv) {
 		// Not enough args, show the help.
 		cout << "-= Help =-" << endl;
 		cout << "This application is used to caliber multiple cameras using photographies." << endl;
-		cout << "When launching this application, append the name of the application by the paths of two or more images." << endl;
-		cout << "Ex: ./cameraCalibration photo1.jpg photo2.jpg" << endl << endl;
-		cout << "Then, you will have to select 6 points on your images and close the selector." << endl;
+		cout << "When launching this application, append the name of the application by -i and  the paths of two or more images." << endl;
+		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg" << endl << endl;
+		cout << "Then append -p and the paths of the points lists associated with your images if you don't want to select your points with the integrated points selector." << endl;
+		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg -p path/points/photo1.list path/points/photo1.list" << endl;
+		cout << "You will ask to select 6 points on your images and close the selector." << endl;
 		cout << "Commands for the selector :" << endl;
 		cout << "\tf : Fullscreen" << endl;
 		cout << "\tescape : Quit and save points in a file." << endl;
@@ -158,9 +160,5 @@ int main(int argc, char** argv) {
 	
 	cout << "That's done." << endl;
 	
-	// Print coordinates
-	
-	//	Delete ALL the cameras !
-	//	for(size_t i = 0; i < imgs.size(); ++i)
-	//		delete imgs[i];
+	// Print coordinates	
 }
