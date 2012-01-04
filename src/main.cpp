@@ -121,17 +121,24 @@ int main(int argc, char** argv) {
 	
 	cout << "Computing results..." << endl;
 	
+	size_t nbPoints = 0;
 	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < imgs.size(); ++i) {
 		Image &img = *imgs[i];
 		
 		// The points are selected so we can load 'em
 		img.loadPoints();
+		// We make sure every image has the same number of points.
+		if(nbPoints == 0)
+			nbPoints = img.points.size();
+		if(!nbPoints || img.points.size() != nbPoints)
+			throw "no a good number of points"; exit(EXIT_FAILURE);
 		// PRINT
 		cout << "Image " << i+1 << " - Points vectors : " << endl;
 		for(size_t vi = 0; vi < img.points.size(); ++vi)
 			printVector(img.points[vi], true);
 		cout << endl;
+		
 		
 		// Make camera
 		img.setCamera();
@@ -146,20 +153,61 @@ int main(int argc, char** argv) {
 		cout << endl;
 		
 		// The homography is used for finding a rotation
-		img.homography = img.resolveHomography();
 		// PRINT
 		cout << "Image " << i+1 << " - Theorical Homography : " << endl;
-		printMatrix(img.homography);
+		printMatrix(img.pCamera->homography());
+		cout << endl;
+	}
+	
+	kn::Vector<double> a(imgs.size() * 3);
+	kn::Vector<double> b(4 + imgs.size()*3*nbPoints);
+	// Every image must have the same resolution, same center (x0, y0), same focale
+	b[0] = imgs[0]->image.width();
+	b[1] = imgs[0]->image.height();
+	b[2] = imgs[0]->pCamera->focale;
+	b[3] = nbPoints;
+	for(size_t i = 0 ; i < imgs.size(); ++i)
+		for(size_t j = 0 ; j < nbPoints; ++j)
+			for(size_t c = 0; c < 3 ; ++c)
+				b[4+i*nbPoints+j*3+c] = imgs[i]->points[j][c];
+	// nonLinearSystemSolver(a, b(), &f(), NB_MAX_ITERATIONS);
+	
+	// Now user configuration is done, we can compute data for every image.
+	for(size_t i = 0; i < imgs.size(); ++i) {
+		Image &img = *imgs[i];
+		kn::Matrix3x3d rotation;// = img.resolveRotationEuler(kn::Vector3d(a[i*3], a[i*3+1], a[i*3+2]));
+		// PRINT
+		cout << "Image " << i+1 << " - Camera - Found anti-rotation parameter : " << endl;
+		printMatrix(rotation);
 		cout << endl;
 		
-		//
-		nonLinearSystemSolver(img.a, img.b(), &img.f(), NB_MAX_ITERATIONS); 
-		// Make a fake camera for describing camera projection ?
+		// We inverse this rotation using SVD
+		img.pCamera->rotation = inverseMatrixSVD(rotation);
+		// PRINT
+		cout << "Image " << i+1 << " - Camera - Rotation parameter : " << endl;
+		printMatrix(img.pCamera->rotation);
+		cout << endl;
+		
+		// Find the actual homography of the camera.
+		// PRINT
+		cout << "Image " << i+1 << " - Camera - Actual homography : " << endl;
+		printMatrix(img.pCamera->homography());
+		cout << endl;
 		
 		// @TODO : Insert strange parameters and compute 'em.
 	}
 	
-	// Now we need to create fake cameras.
+	
+	// Triangulation
+	std::vector<kn::Vector3d> outputVectors(nbPoints);
+	// For each point
+	cout << "Triangulation 3D - Points vectors : " << endl;
+	for(size_t i = 0; i < nbPoints; ++i) {
+		//outputVectors[i] = resolvePointTriangulation(i, imgs); // @TODO in main
+		// PRINT
+		printVector(outputVectors[i], true);
+	}
+	cout << endl;
 	
 	// Build an image
 	

@@ -20,12 +20,10 @@ struct Camera {
 	kn::Matrix3x3d intrinsecParameters;
 	kn::Matrix3x3d rotation;
 	kn::Vector3d center;
-	// kn::Matrix<double> projectionTemp;
 	kn::Matrix<double> projection;
 	
 	virtual kn::Matrix3x3d computeIntrinsecParameters();
-	virtual kn::Matrix3x3d computeHomography(const kn::Matrix3x3d & rotation);
-	// virtual kn::Matrix3x3d computeExtrinsecParameters()
+	virtual kn::Matrix3x3d homography();
 	
 	// We can add here functions for computing other Camera's attributes
 	// Constructor & Destructor

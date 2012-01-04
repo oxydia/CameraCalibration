@@ -21,19 +21,13 @@ struct Image {
 	std::string pointlistPath;
 	kn::ImageRGB8u image;
 	std::vector< kn::Vector3d > points;
-	kn::Vector<double> a;
 	Camera* pCamera;
-	Camera* pFakeCamera;
-	kn::Matrix3x3d homography;
 	
 	void loadJPG();
 	void loadPoints();
 	void setCamera();
 	
-	kn::Matrix3x3d resolveHomography();
-	
-	kn::Vector<double> b();
-	double f();
+	kn::Matrix3x3d resolveRotationEuler(kn::Vector3d angle);
 	
 	Image();
 	// Destructor

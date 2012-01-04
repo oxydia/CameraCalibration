@@ -58,3 +58,11 @@ kn::Vector<double> _nonLinearSystemSolverJacobian(
 	// we return a matrix
 	return vectorJacobi;
 }
+
+// @FIXME
+kn::Vector3d resolvePointTriangulation(const size_t iPoint, const std::vector<Image*> & imgs) {
+	for(size_t i = 0 ; i < imgs.size() ; ++i) {
+		// compute imgs[i].points[iPoint] together to find x, y, z
+	}
+	return kn::Vector3d();
+}

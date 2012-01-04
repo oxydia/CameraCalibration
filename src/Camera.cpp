@@ -27,31 +27,10 @@ Matrix3x3d Camera::computeIntrinsecParameters() {
 	intrinsecParameters[1][2] = width/2.;
 	return intrinsecParameters;
 }
-
-Matrix3x3d Camera::computeHomography(const Matrix3x3d & rotation) {
+	
+Matrix3x3d Camera::homography() {
 	Matrix3x3d homography = intrinsecParameters;
 	homography *= rotation;
 	homography *= inverseMatrixGaussianElimination(intrinsecParameters);
 	return homography;
 }
-
-/*
-Camera::_setExtrinsecParameters() {
-	_setRotation();
-	_setCenter();
-	Vector3d minus_rc = - R*c;
-	Matrix<double> p(3,4);
-	p[];
-	p *= m_K; 
-}
-
-Camera::_setRotation() {
-	
-}
-
-Camera::_setCenter() {
-	
-}
-*/
-
-
