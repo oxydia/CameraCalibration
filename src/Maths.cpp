@@ -95,11 +95,10 @@ kn::Vector<double> _nonLinearSystemSolverJacobian(
 }
 
 double f(kn::Vector<double> & a, const kn::Vector<double> & b, const std::vector<Image*> & imgs) {
-	double res(0), proj1x1Y, proj2x2Y;
+	double res(0), proj1x1Y(0), proj2x2Y(0);
 	kn::Vector3d point1;
 	kn::Vector3d point2;
 	if(imgs.size() != 2) {
-		//  @TODO : accept more images ?
 		std::cerr << "You need to select only 2 images !" << std::endl;
 		exit(1);
 	}
@@ -108,7 +107,6 @@ double f(kn::Vector<double> & a, const kn::Vector<double> & b, const std::vector
 	for(size_t i = 0; i < b[3]; ++i) {
 		proj1x1Y = (rotationCam1 * kn::Vector3d(b[4+4*i],b[4+4*i+1],1.))[1];
 		proj2x2Y = (rotationCam2 * kn::Vector3d(b[4+4*i+2],b[4+4*i+3],1.))[1];
-		//  @TODO : accept more images ?
 		res += pow(proj1x1Y - proj2x2Y, 2);
 	}
 	return res;

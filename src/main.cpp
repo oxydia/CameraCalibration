@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 		cout << "When launching this application, append the name of the application by -i and  the paths of two or more images." << endl;
 		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg" << endl << endl;
 		cout << "Then append -p and the paths of the points lists associated with your images if you don't want to select your points with the integrated points selector." << endl;
-		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg -p path/points/photo1.list path/points/photo1.list" << endl;
+		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg -p path/points/photo1.list path/points/photo2.list" << endl;
 		cout << "You will ask to select 6 points on your images and close the selector." << endl;
 		cout << "Commands for the selector :" << endl;
 		cout << "\tf : Fullscreen" << endl;
@@ -157,6 +157,7 @@ int main(int argc, char** argv) {
 	
 	// will be filled up with rotations vectors
 	kn::Vector<double> a(imgs.size() * 3);
+	a.setZero();
 	// filled up with cameras' parameters
 	kn::Vector<double> b(4 + 2*imgs.size()*nbPoints);
 	// Every image must have the same resolution, same center (x0, y0), same focale
