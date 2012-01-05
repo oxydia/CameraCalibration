@@ -90,7 +90,7 @@ kn::Vector<double> _nonLinearSystemSolverJacobian(
 		aJ[j] += delta_aj;
 		vectorJacobi[j] = ( pF(aJ, b, imgs) - pF(a, b, imgs) ) / delta_aj;
 	}
-	// we return a matrix
+	// we return a matrix 1,n (a vector)
 	return vectorJacobi;
 }
 
@@ -112,7 +112,6 @@ double f(kn::Vector<double> & a, const kn::Vector<double> & b, const std::vector
 	return res;
 }
 
-// @FIXME
 kn::Vector4d resolvePointTriangulation(const size_t iPoint, const std::vector<Image*> & imgs) {
 	kn::Vector3d point;
 	kn::Matrixd projection;
@@ -125,8 +124,7 @@ kn::Vector4d resolvePointTriangulation(const size_t iPoint, const std::vector<Im
 		point = imgs[i]->points[iPoint];
 		projection = imgs[i]->pCamera->projection;
 		bigProjection.setRow(i*2, point[1] * projection.getRow(0) - point[2] * projection.getRow(1));
-		kn::Vectord row = point[2] * projection.getRow(0) - point[0] * projection.getRow(2);
-		bigProjection.setRow(i*2+1, row);
+		bigProjection.setRow(i*2+1, point[2] * projection.getRow(0) - point[0] * projection.getRow(2));
 	}
 	
 	// we have bigProjection

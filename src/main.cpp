@@ -214,13 +214,14 @@ int main(int argc, char** argv) {
 	// For each point
 	cout << "Triangulation 3D - Points vectors : " << endl;
 	for(size_t i = 0; i < nbPoints; ++i) {
-		outputVectors[i] = resolvePointTriangulation(i, imgs); //resolvePointTriangulation(i, imgs); // @TODO in main
+		outputVectors[i] = resolvePointTriangulation(i, imgs);
 		// PRINT
 		printVector(outputVectors[i], true);
 	}
 	cout << endl;
 	
 	// Export a list of points.
+	kn::saveVectorList(outputVectors, "3dpoints.list");
 	
 	// What to add ? Build a 3D image
 	

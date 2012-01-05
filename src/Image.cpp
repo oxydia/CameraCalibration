@@ -13,9 +13,8 @@ void Image::loadJPG() {
 }
 
 void Image::loadPoints() {
-	if(pointlistPath == "") {
+	if(pointlistPath == "")
 		throw "no pointlist path !";
-	}
 	kn::loadVectorList(points, pointlistPath);
 }
 
