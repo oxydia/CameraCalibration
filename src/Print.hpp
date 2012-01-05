@@ -4,20 +4,25 @@
 #include <OpenKN/math/Vector.hpp>
 #include <OpenKN/math/Matrix3x3.hpp>
 
-inline void printMatrix(const kn::Matrix3x3d & m) {
-	std::cout << " |\t" << m[0][0] << "\t\t" << m[0][1] << "\t\t" << m[0][2] << "\t|" << std::endl;
-	std::cout << " |\t" << m[1][0] << "\t\t" << m[1][1] << "\t\t" << m[1][2] << "\t|" << std::endl;
-	std::cout << " |\t" << m[2][0] << "\t\t" << m[2][1] << "\t\t" << m[2][2] << "\t|" << std::endl;
+inline void printMatrix(const kn::Matrix<double> & m) {
+	for(size_t r = 0; r < m.rows(); ++r) {
+		std::cout << " |";
+		for (size_t c = 0; c < m.columns(); ++c)
+			std::cout << "\t" << m[r][c] << "\t|";
+		std::cout << std::endl;
+	}
 }
 
 inline void printVector(const kn::Vector3d & v, bool in_line = false) {
+	// @TODO : debug
 	if(in_line) {
-		std::cout << " (\t" << v[0] << ",\t" << v[1] << ",\t" << v[2] << "\t)" << std::endl;
-	} else {
-		std::cout << " |\t" << v[0] << "\t|" << std::endl;
-		std::cout << " |\t" << v[1] << "\t|" << std::endl;
-		std::cout << " |\t" << v[2] << "\t|" << std::endl;
-	}
+		std::cout << "(";
+		for(size_t c = 0; c < v.size(); ++c)
+			std::cout << "\t" << v[c] << ",\t";
+		std::cout << ")" << std::endl;
+	} else
+		for(size_t c = 0; c < v.size(); ++c)
+			std::cout << " |\t" << v[c] << "\t|" << std::endl;
 }
 
 #endif // _PRINT_HPP_

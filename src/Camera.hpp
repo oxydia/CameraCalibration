@@ -17,14 +17,18 @@ struct Camera {
 	size_t width;
 	float focale;
 	kn::Vector3d position;
-	kn::Matrix3x3d intrinsecParameters;
 	kn::Matrix3x3d rotation;
 	kn::Vector3d center;
 	kn::Matrix<double> projection;
 	
-	virtual kn::Matrix3x3d computeIntrinsecParameters();
+	virtual kn::Matrix3x3d intrinsecParameters();
+	virtual kn::Matrix<double> extrinsecParameters();
 	virtual kn::Matrix3x3d homography();
 	virtual kn::Matrix3x3d computeHomographyFromRotation(const kn::Matrix3x3d & rot);
+	// transfom the coordinates of a point with the projection of the camera
+	virtual kn::Vector3d project(const kn::Vector3d & point);
+	virtual kn::Vector3d findOrigin(const kn::Vector3d & point2d);
+	virtual void computeProjection();
 	
 	// We can add here functions for computing other Camera's attributes
 	// Constructor & Destructor

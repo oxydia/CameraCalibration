@@ -12,7 +12,7 @@
 void nonLinearSystemSolver(
 	kn::Vector<double> &a,
 	const kn::Vector<double> &b,
-	double (*costFunctionPtr)(const kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> & imgs),
+	double (*pF)(const kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> & imgs),
 	const size_t nbMaxIterations,
 	const std::vector<Image*> & imgs);
 

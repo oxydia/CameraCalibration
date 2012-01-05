@@ -37,23 +37,8 @@ int main(int argc, char** argv) {
 	cout << endl << "- Camera calibration. -" << endl << "Holy Razafinjoelina & Alexandre Mahé" << endl;
 	cout << endl << "=============================" << endl << endl;
 	
-	if(argc <= 1) {
-		// Not enough args, show the help.
-		cout << "-= Help =-" << endl;
-		cout << "This application is used to caliber multiple cameras using photographies." << endl;
-		cout << "When launching this application, append the name of the application by -i and  the paths of two or more images." << endl;
-		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg" << endl << endl;
-		cout << "Then append -p and the paths of the points lists associated with your images if you don't want to select your points with the integrated points selector." << endl;
-		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg -p path/points/photo1.list path/points/photo1.list" << endl;
-		cout << "You will ask to select 6 points on your images and close the selector." << endl;
-		cout << "Commands for the selector :" << endl;
-		cout << "\tf : Fullscreen" << endl;
-		cout << "\tescape : Quit and save points in a file." << endl;
-		exit(EXIT_SUCCESS);
-	}
-	// else
 	// For stocking the images.
-	std::vector<Image*> imgs;
+	vector<Image*> imgs;
 	size_t iArg = 1;
 	if(!((string)argv[iArg]).compare("-i")) {
 		++iArg;
@@ -71,8 +56,18 @@ int main(int argc, char** argv) {
 			++iArg;
 		}
 	} else {
-		throw "no args !";
-		exit(EXIT_FAILURE);
+		// Not enough args, show the help.
+		cout << "-= Help =-" << endl;
+		cout << "This application is used to caliber multiple cameras using photographies." << endl;
+		cout << "When launching this application, append the name of the application by -i and  the paths of two or more images." << endl;
+		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg" << endl << endl;
+		cout << "Then append -p and the paths of the points lists associated with your images if you don't want to select your points with the integrated points selector." << endl;
+		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg -p path/points/photo1.list path/points/photo1.list" << endl;
+		cout << "You will ask to select 6 points on your images and close the selector." << endl;
+		cout << "Commands for the selector :" << endl;
+		cout << "\tf : Fullscreen" << endl;
+		cout << "\tescape : Quit and save points in a file." << endl;
+		exit(EXIT_SUCCESS);
 	}
 	
 	// If pointlists paths are set in the application command line
@@ -127,38 +122,42 @@ int main(int argc, char** argv) {
 		Image &img = *imgs[i];
 		// The points are selected so we can load 'em
 		img.loadPoints();
-		
 		// We make sure every image has the same number of points.
 		if(nbPoints == 0)
 			nbPoints = img.points.size();
-		if(!nbPoints || img.points.size() != nbPoints)
-			throw "not a good number of points"; exit(EXIT_FAILURE);
+		if(!nbPoints || img.points.size() != nbPoints) {
+			cout << "not a good number of points" << endl;
+			exit(EXIT_FAILURE);
+		}
 		// PRINT
 		cout << "Image " << i+1 << " - Points vectors : " << endl;
 		for(size_t vi = 0; vi < img.points.size(); ++vi)
 			printVector(img.points[vi], true);
 		cout << endl;
-		
 		// Make camera
+		cout << "Image" << i+1 << " - Camera set" << endl;
 		img.setCamera();
 		// Arbitrarly force the position
 		img.pCamera->position[0] = (double)i;
 		
 		// Camera's intrinsec parameters
-		img.pCamera->computeIntrinsecParameters();
 		// PRINT
 		cout << "Image " << i+1 << " - Camera - Intrinsec parameters : " << endl;
-		printMatrix(img.pCamera->intrinsecParameters);
+		printMatrix(img.pCamera->intrinsecParameters());
 		cout << endl;
 		
 		// The homography is used for finding a rotation
 		// PRINT
-		cout << "Image " << i+1 << " - Theorical Homography : " << endl;
-		printMatrix(img.pCamera->homography());
-		cout << endl;
+		//cout << "Image " << i+1 << " - Theorical Homography : " << endl;
+		//printMatrix(img.pCamera->homography());
+		//cout << endl;
 	}
 	
+	cout << "Computing inversed transformations" << endl;
+	
+	// will be filled up with rotations vectors
 	kn::Vector<double> a(imgs.size() * 3);
+	// filled up with cameras' parameters
 	kn::Vector<double> b(4 + 2*imgs.size()*nbPoints);
 	// Every image must have the same resolution, same center (x0, y0), same focale
 	b[0] = imgs[0]->image.width();
@@ -168,22 +167,25 @@ int main(int argc, char** argv) {
 	for(size_t j = 0 ; j < nbPoints; ++j)
 		for(size_t i = 0 ; i < imgs.size(); ++i)
 			for(size_t c = 0; c < 2 ; ++c)
-				b[4+i*(imgs.size()*2)+j*2+c] = imgs[i]->points[j][c];
-	// nonLinearSystemSolver(a, b(), &f(), NB_MAX_ITERATIONS, imgs);
+				b[4+j*(imgs.size()*2)+i*2+c] = imgs[i]->points[j][c];
+	
+	// non linear resolution to find the best rotations
+	// nonLinearSystemSolver(a, b, &f, NB_MAX_ITERATIONS, imgs);
 	
 	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < imgs.size(); ++i) {
+		// Vector a[i*3] -> a[i*3+2] is the vector of the rotation that we need to compute transformation matrix.
 		Image &img = *imgs[i];
 		kn::Matrix3x3d rotation = kn::eulerAngles3x3d(a[i*3], a[i*3+1], a[i*3+2]);
 		// PRINT
-		cout << "Image " << i+1 << " - Camera - Found anti-rotation parameter : " << endl;
+		cout << "Image " << i+1 << " - Camera - Found anti-transformation parameter : " << endl;
 		printMatrix(rotation);
 		cout << endl;
 		
-		// We inverse this rotation using SVD
-		img.pCamera->rotation = kn::inverseMatrixSVD(rotation);
+		// We inverse this transformation (rotation) by transposing it and set it to the camera
+		img.pCamera->rotation = rotation.transpose();
 		// PRINT
-		cout << "Image " << i+1 << " - Camera - Rotation parameter : " << endl;
+		cout << "Image " << i+1 << " - Camera - Transformation (rotation) parameter : " << endl;
 		printMatrix(img.pCamera->rotation);
 		cout << endl;
 		
@@ -193,18 +195,25 @@ int main(int argc, char** argv) {
 		printMatrix(img.pCamera->homography());
 		cout << endl;
 		
+		// Find the actual projection of the camera.
+		img.pCamera->computeProjection();
+		// PRINT
+		cout << "Image " << i+1 << " - Camera - Projection : " << endl;
+		printMatrix(img.pCamera->projection);
+		cout << endl;
+		
 		// @TODO : Insert strange parameters and compute 'em.
 	}
 	
 	
 	// Triangulation
-	std::vector<kn::Vector3d> outputVectors(nbPoints);
+	vector< kn::Vector<double> > outputVectors(nbPoints);
 	// For each point
 	cout << "Triangulation 3D - Points vectors : " << endl;
 	for(size_t i = 0; i < nbPoints; ++i) {
-		//outputVectors[i] = resolvePointTriangulation(i, imgs); // @TODO in main
+		outputVectors[i] = kn::Vector<double>(4); //resolvePointTriangulation(i, imgs); // @TODO in main
 		// PRINT
-		printVector(outputVectors[i], true);
+		//printVector(outputVectors[i], true);
 	}
 	cout << endl;
 	
