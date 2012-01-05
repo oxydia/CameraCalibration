@@ -214,9 +214,9 @@ int main(int argc, char** argv) {
 	// For each point
 	cout << "Triangulation 3D - Points vectors : " << endl;
 	for(size_t i = 0; i < nbPoints; ++i) {
-		outputVectors[i] = kn::Vector<double>(4); //resolvePointTriangulation(i, imgs); // @TODO in main
+		outputVectors[i] = resolvePointTriangulation(i, imgs); //resolvePointTriangulation(i, imgs); // @TODO in main
 		// PRINT
-		//printVector(outputVectors[i], true);
+		printVector(outputVectors[i], true);
 	}
 	cout << endl;
 	

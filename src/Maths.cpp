@@ -15,13 +15,12 @@ void nonLinearSystemSolver(
 	kn::Matrixd jTj = jT * j;
 	
 	// alpha = valeur moyenne des elements de la diagonale de jTransposed * j;
-	double alpha = 0.;
+	double alpha(0), cptIteration(0);
 	for(size_t i = 0; i < a.size(); ++i)
 		alpha += jTj[i][i];
 	alpha *= pow(10, -3) / a.size();
-	std::cout << std::endl;
 	for(size_t i = 0; i < nbMaxIterations ; ++i) {
-		std::cout << "Iteration #" << i+1 << std::endl;
+		++cptIteration;
 		if(i != 0) {
 			jacobianVector = _nonLinearSystemSolverJacobian(a, b, pF, imgs);
 			j = kn::Matrixd(1, a.size(), jacobianVector, true);
@@ -55,6 +54,7 @@ void nonLinearSystemSolver(
 				accepted = true;
 		} while (!accepted);
 	}
+	std::cout << std::endl << cptIteration << " iterations ... ";
 }
 
 /*double _nonLinearSystemSolverSVD(
@@ -114,8 +114,19 @@ double f(kn::Vector<double> & a, const kn::Vector<double> & b, const std::vector
 
 // @FIXME
 kn::Vector4d resolvePointTriangulation(const size_t iPoint, const std::vector<Image*> & imgs) {
+	kn::Vector3d point;
+	kn::Matrixd projection;
+	kn::Vector4d result;
+	result.setZero();
+	
+	// triangulation
 	for(size_t i = 0 ; i < imgs.size() ; ++i) {
+		point = imgs[i]->points[iPoint];
+		projection = imgs[i]->pCamera->projection;
 		// compute imgs[i].points[iPoint] together to find x, y, z
+		
+		// result = ;
 	}
-	return kn::Vector4d();
+	
+	return result;
 }
