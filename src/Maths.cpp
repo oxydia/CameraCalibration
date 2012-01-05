@@ -116,17 +116,20 @@ double f(kn::Vector<double> & a, const kn::Vector<double> & b, const std::vector
 kn::Vector4d resolvePointTriangulation(const size_t iPoint, const std::vector<Image*> & imgs) {
 	kn::Vector3d point;
 	kn::Matrixd projection;
-	kn::Vector4d result;
-	result.setZero();
+	kn::Matrixd bigProjection(4,4);
+	kn::Vectord result;
 	
 	// triangulation
-	for(size_t i = 0 ; i < imgs.size() ; ++i) {
+	// @TODO : more than 2 images ?
+	for(size_t i = 0 ; i < 2 /*imgs.size()*/ ; ++i) {
 		point = imgs[i]->points[iPoint];
 		projection = imgs[i]->pCamera->projection;
-		// compute imgs[i].points[iPoint] together to find x, y, z
-		
-		// result = ;
+		bigProjection.setRow(i*2, point[1] * projection.getRow(0) - point[2] * projection.getRow(1));
+		kn::Vectord row = point[2] * projection.getRow(0) - point[0] * projection.getRow(2);
+		bigProjection.setRow(i*2+1, row);
 	}
 	
-	return result;
+	// we have bigProjection
+	solveNullSystemSVD(bigProjection, result);
+	return (kn::Vector4d)result;
 }
