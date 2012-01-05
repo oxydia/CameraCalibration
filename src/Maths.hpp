@@ -16,14 +16,6 @@ void nonLinearSystemSolver(
 	const size_t nbMaxIterations,
 	const std::vector<Image*> & imgs);
 
-/*double _nonLinearSystemSolverSVD(
-	kn::Vector<double> &a, const kn::Vector<double> &b,
-	double (*pF)(kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> &),
-	kn::Matrix<double> & j,
-	const std::vector<Image*> & imgs,
-	const kn::Matrix<double> alpha);
-*/
-
 kn::Vector<double> _nonLinearSystemSolverJacobian(
 	kn::Vector<double> &a, const kn::Vector<double> &b,
 	double (*pF)(kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> &),

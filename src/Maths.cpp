@@ -57,25 +57,6 @@ void nonLinearSystemSolver(
 	std::cout << std::endl << cptIteration << " iterations ... ";
 }
 
-/*double _nonLinearSystemSolverSVD(
-	kn::Vector<double> &a, const kn::Vector<double> &b,
-	double (*pF)(kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> &),
-	kn::Matrix<double> & j,
-	const std::vector<Image*> & imgs,
-	const kn::Matrix<double> & alpha)
-{
-	return - pseudoInverseMatrixSVD(j) * f(a, b, imgs);
-	
-	kn::Vector<double> w, x, jSVDPseudoInverse;
-	kn::Matrix<double> u = j, v;
-	decompositionSVD(u, w, v);
-	sortSingularValuesSVD(u, w, v);
-	solveSVD(u, w, v, jSVDPseudoInverse, x);
-	// jSVDPseudoInverse should be a 1*1 matrix
-	assert(jSVDPseudoInverse.size() == 1);
-	return (double)(-jSVDPseudoInverse[0] * pF(a, b, imgs));
-}*/
-
 kn::Vector<double> _nonLinearSystemSolverJacobian(
 	kn::Vector<double> &a, const kn::Vector<double> &b,
 	double (*pF)(kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> &),
@@ -127,7 +108,6 @@ kn::Vector4d resolvePointTriangulation(const size_t iPoint, const std::vector<Im
 		bigProjection.setRow(i*2+1, point[2] * projection.getRow(0) - point[0] * projection.getRow(2));
 	}
 	
-	// we have bigProjection
 	solveNullSystemSVD(bigProjection, result);
 	return (kn::Vector4d)result;
 }

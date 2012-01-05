@@ -1,7 +1,6 @@
 #ifndef _IMAGE_HPP_
 #define _IMAGE_HPP_
 
-// @TODO : Resolve compilations errors
 #include "Camera.hpp"
 #include <sstream>
 #include <vector>
@@ -10,7 +9,6 @@
 #include <OpenKN/math/Vector.hpp>
 #include <OpenKN/math/Matrix3x3.hpp>
 #include <OpenKN/math/MathIO.hpp>
-// @TODO : Need to add debug code
 #include <cassert>
 #include <string>
 #include <exception>

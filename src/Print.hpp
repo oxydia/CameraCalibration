@@ -23,7 +23,6 @@ inline void printMatrix(const kn::Matrix<double> & m) {
 }
 
 inline void printVector(const kn::Vector<double> & v, bool in_line = false) {
-	// @TODO : debug
 	if(in_line) {
 		std::cout << "(";
 		for(size_t c = 0; c < v.size(); ++c)

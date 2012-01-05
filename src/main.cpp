@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sstream>
-// @TODO : Need to add debug code
 #include <cassert>
 #include <exception>
 
@@ -205,8 +204,6 @@ int main(int argc, char** argv) {
 		cout << "Image " << i+1 << " - Camera - Projection : " << endl;
 		printMatrix(img.pCamera->projection);
 		cout << endl;
-		
-		// @TODO : Insert strange parameters and compute 'em.
 	}
 	
 	// Triangulation
