@@ -1,7 +1,6 @@
 #ifndef _CAMERA_HPP_
 #define _CAMERA_HPP_
 
-#include "Print.hpp"
 #include <cstdlib>
 #include <cmath>
 #include <OpenKN/math/Vector.hpp>

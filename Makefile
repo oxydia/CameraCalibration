@@ -1,13 +1,16 @@
 GXX = g++
-FLAGS = -Wall -g -lOpenKN-math -lOpenKN-image -lglut -lGLU -lGLEW -L. -I. -O2
+FLAGS = -lOpenKN-math -lOpenKN-image -lglut -lGLU -lGLEW -L.   -O2 -Wall -g -I.
 SRCDIR = src
-EXE = cameraCalibration
+EXE = calibration
 
-$(EXE): $(SRCDIR)/*.cpp
-	@$(GXX) $^ -o $(EXE) $(FLAGS)
+
+$(EXE) : $(SRCDIR)/* $(SRCDIR)/Print.hpp
+	@echo "Generating executable, this may take a while."
+	@$(GXX) $^ $(FLAGS) -o $(EXE)
 	@echo "Executable generated successfully."
-	@echo "Wanna launch it ? Just type './cameraCalibration' without argument for help."
-    
+	@echo "Wanna launch it ? Just type './calibration' without argument for help."
+
+ 
 .PHONY : clean ultraclean fresh
 
 clean :
@@ -20,5 +23,5 @@ ultraclean : clean
 	@echo "Cleaning executabe done."
 	
 fresh : ultraclean
-	@rm -f out/*
+	@rm -f out/*git
 	@echo "Cleaning out directory done."

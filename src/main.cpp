@@ -12,6 +12,7 @@
 // @TODO : Need to add debug code
 #include <cassert>
 #include <exception>
+
 #define POINTLISTEXPORTER "lib/PointListAcquisition/pointListExporter"
 
 using namespace std;
@@ -33,7 +34,7 @@ const static int NB_MAX_ITERATIONS = 20;
 
 // main
 int main(int argc, char** argv) {
-	// command : cameraCalibration -i p0.jpg p1.jpg -p p0.list p1.list
+	// command : calibration -i p0.jpg p1.jpg -p p0.list p1.list
 	cout << endl << "- Camera calibration. -" << endl << "Holy Razafinjoelina & Alexandre Mahé" << endl;
 	cout << endl << "=============================" << endl << endl;
 	
@@ -60,10 +61,10 @@ int main(int argc, char** argv) {
 		cout << "-= Help =-" << endl;
 		cout << "This application is used to caliber multiple cameras using photographies." << endl;
 		cout << "When launching this application, append the name of the application by -i and  the paths of two or more images." << endl;
-		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg" << endl << endl;
+		cout << "Ex: ./calibration -i path/photo1.jpg path/photo2.jpg" << endl << endl;
 		cout << "Then append -p and the paths of the points lists associated with your images if you don't want to select your points with the integrated points selector." << endl;
-		cout << "Ex: ./cameraCalibration -i path/photo1.jpg path/photo2.jpg -p path/points/photo1.list path/points/photo2.list" << endl;
-		cout << "You will ask to select 6 points on your images and close the selector." << endl;
+		cout << "Ex: ./calibration -i path/photo1.jpg path/photo2.jpg -p path/points/photo1.list path/points/photo2.list" << endl;
+		cout << "You will have to select some points on your images and close the selector." << endl;
 		cout << "Commands for the selector :" << endl;
 		cout << "\tf : Fullscreen" << endl;
 		cout << "\tescape : Quit and save points in a file." << endl;
@@ -93,7 +94,7 @@ int main(int argc, char** argv) {
 			if (!iStatus)
 				iNumProc++;
 		}
-		cout << "Press ESC when you are done selecting the 6 points." << endl;
+		cout << "Press ESC when you are done selecting some points, identical from an image to another." << endl;
 		
 		// Wait till the commands complete
 		while (iNumProc && !iExitFlag)
@@ -208,7 +209,6 @@ int main(int argc, char** argv) {
 		// @TODO : Insert strange parameters and compute 'em.
 	}
 	
-	
 	// Triangulation
 	vector< kn::Vector<double> > outputVectors(nbPoints);
 	// For each point
@@ -221,9 +221,10 @@ int main(int argc, char** argv) {
 	cout << endl;
 	
 	// Export a list of points.
-	kn::saveVectorList(outputVectors, "3dpoints.list");
+	kn::saveVectorList(outputVectors, "./out/3dpoints.list");
 	
-	// What to add ? Build a 3D image
+	// Export an image
+	printPointsMapJpeg(outputVectors, imgs);
 	
-	cout << "That's done." << endl;
+	cout << "That's done." << endl << "You will find a list of 3d points and a picture of your cameras in the directory out." << endl;
 }
