@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	// For stocking the images.
 	vector<Image*> imgs;
 	size_t iArg = 1;
-	if(!((string)argv[iArg]).compare("-i")) {
+	if(argc > 2 && !((string)argv[iArg]).compare("-i")) {
 		++iArg;
 		const int j(iArg);
 		while(argv[iArg] && ((string)argv[iArg]).compare("-p")) {
@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
 		//cout << endl;
 	}
 	
-	cout << "Computing inversed transformations" << endl;
+	cout << "-- Computing inversed transformations --" << endl;
 	
 	// will be filled up with rotations vectors
 	kn::Vector<double> a(imgs.size() * 3);
@@ -169,8 +169,10 @@ int main(int argc, char** argv) {
 			for(size_t c = 0; c < 2 ; ++c)
 				b[4+j*(imgs.size()*2)+i*2+c] = imgs[i]->points[j][c];
 	
+	cout << "Non-linear system resolution :";
 	// non linear resolution to find the best rotations
-	// nonLinearSystemSolver(a, b, &f, NB_MAX_ITERATIONS, imgs);
+	nonLinearSystemSolver(a, b, &f, NB_MAX_ITERATIONS, imgs);
+	cout << "done" << endl;
 	
 	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < imgs.size(); ++i) {

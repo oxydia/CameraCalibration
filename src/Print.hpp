@@ -13,7 +13,7 @@ inline void printMatrix(const kn::Matrix<double> & m) {
 	}
 }
 
-inline void printVector(const kn::Vector3d & v, bool in_line = false) {
+inline void printVector(const kn::Vector<double> & v, bool in_line = false) {
 	// @TODO : debug
 	if(in_line) {
 		std::cout << "(";
