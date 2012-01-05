@@ -10,7 +10,7 @@ void nonLinearSystemSolver(
 	// derivative of f(a,b) (d a) // f returns a scalar so j is a one line matrix (a vector)
 	kn::Vectord jacobianVector = _nonLinearSystemSolverJacobian(a, b, pF, imgs);
 	// jBase is the jacobianVector converted into a matrix.
-	kn::Matrixd j, jT = j;
+	kn::Matrixd j(1, a.size(), jacobianVector, true), jT = j;
 	jT.transpose();
 	kn::Matrixd jTj = jT * j;
 	
@@ -19,29 +19,29 @@ void nonLinearSystemSolver(
 	for(size_t i = 0; i < a.size(); ++i)
 		alpha += jTj[i][i];
 	alpha *= pow(10, -3) / a.size();
-	
+	std::cout << std::endl;
 	for(size_t i = 0; i < nbMaxIterations ; ++i) {
+		std::cout << "Iteration #" << i+1 << std::endl;
 		if(i != 0) {
-			// derivative of f(a,b) (d a) // f returns a scalar so j is a one line matrix (a vector)
 			jacobianVector = _nonLinearSystemSolverJacobian(a, b, pF, imgs);
 			j = kn::Matrixd(1, a.size(), jacobianVector, true);
-			jT = j; jT.transpose();
+			kn::Matrixd jCp = j;
+			jCp.transpose();
+			jT = jCp;
 		}
 		size_t cpt = 0;
 		bool accepted = false;
 		do {
-			//kn::Matrixd step_a_matrix = _nonLinearSystemSolverSVD(a, b, pF, j, imgs, alpha);
 			kn::Matrix<double> identity(a.size(), a.size());
 			identity.setIdentity();
 			kn::Matrix<double> aSystem;
-			kn::Vector<double> step_a, bSystem;
+			kn::Vector<double> step_a(a.size(), 0.), bSystem;
 			aSystem = jT * j + alpha * identity;
 			bSystem = - jacobianVector * f(a, b, imgs);
+			
+			// solve the system using SVD
 			solveSystemSVD(aSystem, step_a, bSystem);
-			std::cout << "Step_a = " << std::endl;
-			printVector(step_a);
-			//for(size_t c = 0; c < step_a.size(); ++c)
-			//	step_a[c] = step_a_matrix[c][0];
+			
 			kn::Vector<double> a_plus_step_a = a + step_a;
 			if(fabs(pF(a_plus_step_a, b, imgs)) < fabs(pF(a, b, imgs))) {
 				a = a_plus_step_a;
