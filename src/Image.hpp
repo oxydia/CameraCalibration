@@ -26,8 +26,6 @@ struct Image {
 	void loadPoints();
 	void setCamera();
 	
-	kn::Matrix3x3d resolveRotationEuler(kn::Vector3d angle);
-	
 	Image();
 	// Destructor
 	~Image();

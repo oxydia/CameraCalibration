@@ -1,18 +1,4 @@
-#include "Camera.hpp"
-#include "Image.hpp"
-#include "Print.hpp"
-#include "Maths.hpp"
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sstream>
-#include <cassert>
-#include <exception>
-
-#define POINTLISTEXPORTER "lib/PointListAcquisition/pointListExporter"
+#include "main.hpp"
 
 using namespace std;
 
@@ -132,25 +118,16 @@ int main(int argc, char** argv) {
 		// PRINT
 		cout << "Image " << i+1 << " - Points vectors : " << endl;
 		for(size_t vi = 0; vi < img.points.size(); ++vi)
-			printVector(img.points[vi], true);
+			cout << img.points[vi] << endl;
 		cout << endl;
 		// Make camera
-		cout << "Image" << i+1 << " - Camera set" << endl;
 		img.setCamera();
 		// Arbitrarly force the position
 		img.pCamera->position[0] = (double)i;
 		
 		// Camera's intrinsec parameters
 		// PRINT
-		cout << "Image " << i+1 << " - Camera - Intrinsec parameters : " << endl;
-		printMatrix(img.pCamera->intrinsecParameters());
-		cout << endl;
-		
-		// The homography is used for finding a rotation
-		// PRINT
-		//cout << "Image " << i+1 << " - Theorical Homography : " << endl;
-		//printMatrix(img.pCamera->homography());
-		//cout << endl;
+		cout << "Image " << i+1 << " - Camera - Intrinsec parameters : " << endl << img.pCamera->intrinsecParameters() << endl;
 	}
 	
 	cout << "-- Computing inversed transformations --" << endl;
@@ -169,27 +146,28 @@ int main(int argc, char** argv) {
 		for(size_t i = 0 ; i < imgs.size(); ++i)
 			for(size_t c = 0; c < 2 ; ++c)
 				b[4+j*(imgs.size()*2)+i*2+c] = imgs[i]->points[j][c];
+				
+	
+	cout << endl << "Vector b : " << endl << b << endl;
 	
 	cout << "Non-linear system resolution :";
 	// non linear resolution to find the best rotations
 	nonLinearSystemSolver(a, b, &f, NB_MAX_ITERATIONS, imgs);
 	cout << "done" << endl;
 	
+	cout << endl << "Vector a found : " << endl << a << endl;
+	
 	for(size_t i = 0; i < imgs.size(); ++i) {
 		// Vector a[i*3] -> a[i*3+2] is the vector of the rotation that we need to compute transformation matrix.
 		Image &img = *imgs[i];
 		kn::Matrix3x3d rotation = kn::eulerAngles3x3d(a[i*2],a[i*2+1], a[i*2+2]);
 		// PRINT
-		cout << "Image " << i+1 << " - Camera - Found anti-transformation parameter : " << endl;
-		printMatrix(rotation);
-		cout << endl;
+		cout << "Image " << i+1 << " - Camera - Found anti-transformation parameter : " << endl << rotation << endl;
 		
 		// We inverse this transformation (rotation) by transposing it and set it to the camera
 		img.pCamera->rotation = rotation.transpose();
 		// PRINT
-		cout << "Image " << i+1 << " - Camera - Transformation (rotation) parameter : " << endl;
-		printMatrix(img.pCamera->rotation);
-		cout << endl;
+		cout << "Image " << i+1 << " - Camera - Transformation (rotation) parameter : " << endl << img.pCamera->rotation << endl;
 		
 		// Reset center.
 		kn::Vector3d oldPosition;
@@ -199,16 +177,12 @@ int main(int argc, char** argv) {
 		
 		// Find the actual homography of the camera.
 		// PRINT
-		cout << "Image " << i+1 << " - Camera - Actual homography : " << endl;
-		printMatrix(img.pCamera->homography());
-		cout << endl;
+		cout << "Image " << i+1 << " - Camera - Actual homography : " << endl << img.pCamera->homography()  << endl;
 		
 		// Find the actual projection of the camera.
 		img.pCamera->computeProjection();
 		// PRINT
-		cout << "Image " << i+1 << " - Camera - Projection : " << endl;
-		printMatrix(img.pCamera->projection);
-		cout << endl;
+		cout << "Image " << i+1 << " - Camera - Projection : " << endl << img.pCamera->projection << endl;
 	}
 	
 	// Triangulation
@@ -218,7 +192,7 @@ int main(int argc, char** argv) {
 	for(size_t i = 0; i < nbPoints; ++i) {
 		outputVectors[i] = resolvePointTriangulation(i, imgs);
 		// PRINT
-		printVector(outputVectors[i], true);
+		cout << "Point " << i << " : " << outputVectors[i] << endl;
 	}
 	cout << endl;
 	
@@ -233,7 +207,21 @@ int main(int argc, char** argv) {
         delete imgs.back();
         imgs.pop_back();
     }
-
-	
+    
 	cout << "That's done." << endl << "You will find a list of 3d points and a picture of your cameras in the directory out." << endl;
+}
+
+void printPointsMapJpeg(const std::vector<kn::Vectord> & outputPoints, std::vector<Image*> & imgs) {
+	kn::ImageRGB<unsigned char> img(JPEG_OUT_WIDTH, JPEG_OUT_HEIGHT);
+	img.fill(255);
+	
+	// @FIXME
+	for(size_t i = 0; i < outputPoints.size(); ++i)
+		kn::drawCircle(img, outputPoints[i][0] * 100 + JPEG_OUT_WIDTH / 2, outputPoints[i][2] * 100 + JPEG_OUT_HEIGHT / 2, 4, 0, 0, 255);
+
+	for(size_t i = 0; i < imgs.size(); ++i)
+		kn::drawCircle(img, imgs[i]->pCamera->center[0] * 100 + JPEG_OUT_WIDTH / 2, imgs[i]->pCamera->center[2] * 100 + JPEG_OUT_HEIGHT / 2, 4, 255, 0, 0);
+
+	if (!kn::saveJPG(img, "./out/points_map.jpg", 100))
+		std::cerr << "Saving impossible !" << std::endl;
 }
