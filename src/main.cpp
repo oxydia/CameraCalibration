@@ -217,10 +217,10 @@ void printPointsMapJpeg(const std::vector<kn::Vectord> & outputPoints, std::vect
 	
 	// @FIXME
 	for(size_t i = 0; i < outputPoints.size(); ++i)
-		kn::drawCircle(img, outputPoints[i][0] * 100 + JPEG_OUT_WIDTH / 2, outputPoints[i][2] * 100 + JPEG_OUT_HEIGHT / 2, 4, 0, 0, 255);
+		kn::drawCircle(img, outputPoints[i][0] * 100 + JPEG_OUT_WIDTH / 2, outputPoints[i][2] * 100 + JPEG_OUT_HEIGHT / 2 + 100, 4, 0, 0, 255);
 
 	for(size_t i = 0; i < imgs.size(); ++i)
-		kn::drawCircle(img, imgs[i]->pCamera->center[0] * 100 + JPEG_OUT_WIDTH / 2, imgs[i]->pCamera->center[2] * 100 + JPEG_OUT_HEIGHT / 2, 4, 255, 0, 0);
+		kn::drawCircle(img, imgs[i]->pCamera->center[0] * 100 + JPEG_OUT_WIDTH / 2, imgs[i]->pCamera->center[2] * 100 + JPEG_OUT_HEIGHT / 2 + 100, 4, 255, 0, 0);
 
 	if (!kn::saveJPG(img, "./out/points_map.jpg", 100))
 		std::cerr << "Saving impossible !" << std::endl;
