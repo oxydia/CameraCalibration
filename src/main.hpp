@@ -15,9 +15,10 @@
 #include <exception>
 #include <OpenKN/image/DrawCircle.hpp>
 
-#define JPEG_OUT_WIDTH 800
-#define JPEG_OUT_HEIGHT 600
-#define POINTLISTEXPORTER "lib/PointListAcquisition/pointListExporter"
+static const std::string POINTLISTEXPORTER = "lib/PointListAcquisition/pointListExporter";
+static const size_t JPEG_OUT_WIDTH = 800;
+static const size_t JPEG_OUT_HEIGHT = 600;
+static const size_t NB_MAX_ITERATIONS = 200;
 
 int runCommand(const char *strCommand);
 int main(int argc, char** argv);

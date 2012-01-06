@@ -15,8 +15,6 @@ int runCommand(const char *strCommand)
 	return(iStatus);
 }
 
-const static int NB_MAX_ITERATIONS = 20;
-
 // main
 int main(int argc, char** argv) {
 	// command : calibration -i p0.jpg p1.jpg -p p0.list p1.list
@@ -170,10 +168,10 @@ int main(int argc, char** argv) {
 		cout << "Image " << i+1 << " - Camera - Transformation (rotation) parameter : " << endl << img.pCamera->rotation << endl;
 		
 		// Reset center.
-		kn::Vector3d oldPosition;
+		/*kn::Vector3d oldPosition;
 		oldPosition.setZero();
-		oldPosition[0] = i;
-		img.pCamera->center = - img.pCamera->rotation * oldPosition;
+		oldPosition[0] = i;*/
+		img.pCamera->center = - img.pCamera->rotation * img.pCamera->position;
 		
 		// Find the actual homography of the camera.
 		// PRINT
@@ -188,7 +186,7 @@ int main(int argc, char** argv) {
 	// Triangulation
 	vector< kn::Vector<double> > outputVectors(nbPoints);
 	// For each point
-	cout << "Triangulation 3D - Points vectors : " << endl;
+	cout << "Triangulation 3D - Points positions : " << endl;
 	for(size_t i = 0; i < nbPoints; ++i) {
 		outputVectors[i] = resolvePointTriangulation(i, imgs);
 		// PRINT

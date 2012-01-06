@@ -16,18 +16,20 @@ void nonLinearSystemSolver(
 	kn::Matrixd jTj = jT * j;
 	
 	// alpha = valeur moyenne des elements de la diagonale de jTransposed * j;
-	double alpha(0), cptIteration(0);
+	double lambda(0), cptIteration(0);
+	// average
 	for(size_t i = 0; i < a.size(); ++i)
-		alpha += jTj[i][i];
-	alpha *= pow(10, -3) / a.size();
+		lambda += jTj[i][i];
+	lambda /= a.size();
+	lambda *= pow(10, -3);
 	for(size_t i = 0; i < nbMaxIterations ; ++i) {
 		++cptIteration;
 		if(i != 0) {
 			jacobianVector = _nonLinearSystemSolverJacobian(a, b, pF, imgs);
 			j = kn::Matrixd(1, a.size(), jacobianVector, true);
-			kn::Matrixd jCp = j;
-			jCp.transpose();
-			jT = jCp;
+			jT.transpose();
+			jT = j;
+			jT.transpose();
 		}
 		size_t cpt = 0;
 		bool accepted = false;
@@ -35,7 +37,7 @@ void nonLinearSystemSolver(
 			kn::Matrix<double> aSystem;
 			kn::Vector<double> step_a(a.size(), 0.), bSystem;
 			identity.setIdentity();
-			aSystem = jT * j + alpha * identity;
+			aSystem = jT * j + lambda * identity;
 			bSystem = - jacobianVector * f(a, b, imgs);
 			
 			// solve the system using SVD
@@ -44,13 +46,13 @@ void nonLinearSystemSolver(
 			kn::Vector<double> a_plus_step_a = a + step_a;
 			if(fabs(pF(a_plus_step_a, b, imgs)) < fabs(pF(a, b, imgs))) {
 				a = a_plus_step_a;
-				alpha /= 10.;
+				lambda /= 10.;
 				accepted = true;
-			} else
-				alpha *= 10.;
+			} else {
+				lambda *= 10.;
+			}
 
-			++cpt;
-			if(cpt > 100)
+			if(++cpt > 100)
 				accepted = true;
 		} while (!accepted);
 	}
@@ -66,7 +68,7 @@ kn::Vector<double> _nonLinearSystemSolverJacobian(
 	// partial derivation
 	for(size_t j = 0; j < a.size(); ++j) {
 		kn::Vectord aJ = a;
-		double delta_aj = std::max(std::min(a[j]*std::pow(10, -4), std::pow(10, -6)), std::pow(10, -15));
+		double delta_aj = std::max(std::min(abs(a[j])*std::pow(10, -4), std::pow(10, -6)), std::pow(10, -15));
 		aJ[j] += delta_aj;
 		jacob[j] = ( pF(aJ, b, imgs) - pF(a, b, imgs) ) / delta_aj;
 	}
