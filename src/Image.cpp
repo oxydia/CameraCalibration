@@ -5,7 +5,7 @@ Image::Image() :
 {}
 
 Image::~Image() {
-	delete [] pCamera;
+	delete pCamera;
 }
 
 void Image::loadJPG() {
@@ -19,5 +19,7 @@ void Image::loadPoints() {
 }
 
 void Image::setCamera() {
+	if(!!pCamera)
+		delete pCamera;
 	pCamera = new Camera((size_t)image.width(), (size_t)image.height());
 }

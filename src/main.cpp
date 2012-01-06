@@ -228,5 +228,12 @@ int main(int argc, char** argv) {
 	// Export an image
 	printPointsMapJpeg(outputVectors, imgs);
 	
+	// delete imgs
+	while(!imgs.empty()) {
+        delete imgs.back();
+        imgs.pop_back();
+    }
+
+	
 	cout << "That's done." << endl << "You will find a list of 3d points and a picture of your cameras in the directory out." << endl;
 }
