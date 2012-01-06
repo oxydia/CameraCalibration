@@ -23,5 +23,5 @@ ultraclean : clean
 	@echo "Cleaning executabe done."
 	
 fresh : ultraclean
-	@rm -f out/*git
+	@rm -f out/*
 	@echo "Cleaning out directory done."

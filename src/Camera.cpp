@@ -59,12 +59,6 @@ kn::Vector3d Camera::project(const Vector4d & point3d) {
 	return projection * point3d;
 }
 
-kn::Vector4d Camera::findOrigin(const Vector3d & point2d) {
-	// SVD, cf system aX = 0, page 11
-	
-	return kn::Vector4d(); // point3d;
-}
-
 void Camera::computeProjection() {
 	projection = intrinsecParameters() * extrinsecParameters();
 }

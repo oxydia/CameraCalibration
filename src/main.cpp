@@ -175,11 +175,10 @@ int main(int argc, char** argv) {
 	nonLinearSystemSolver(a, b, &f, NB_MAX_ITERATIONS, imgs);
 	cout << "done" << endl;
 	
-	// Now user configuration is done, we can compute data for every image.
 	for(size_t i = 0; i < imgs.size(); ++i) {
 		// Vector a[i*3] -> a[i*3+2] is the vector of the rotation that we need to compute transformation matrix.
 		Image &img = *imgs[i];
-		kn::Matrix3x3d rotation = kn::eulerAngles3x3d(a[i*3], a[i*3+1], a[i*3+2]);
+		kn::Matrix3x3d rotation = kn::eulerAngles3x3d(a[i*2],a[i*2+1], a[i*2+2]);
 		// PRINT
 		cout << "Image " << i+1 << " - Camera - Found anti-transformation parameter : " << endl;
 		printMatrix(rotation);
@@ -191,6 +190,12 @@ int main(int argc, char** argv) {
 		cout << "Image " << i+1 << " - Camera - Transformation (rotation) parameter : " << endl;
 		printMatrix(img.pCamera->rotation);
 		cout << endl;
+		
+		// Reset center.
+		kn::Vector3d oldPosition;
+		oldPosition.setZero();
+		oldPosition[0] = i;
+		img.pCamera->center = - img.pCamera->rotation * oldPosition;
 		
 		// Find the actual homography of the camera.
 		// PRINT

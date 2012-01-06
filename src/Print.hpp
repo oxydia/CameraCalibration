@@ -10,8 +10,8 @@
 #include <OpenKN/image/ImageRGB.hpp>
 #include <cstdio>
 #include <cstdlib>
-#define JPEG_OUT_WIDTH 500
-#define JPEG_OUT_HEIGHT 500
+#define JPEG_OUT_WIDTH 800
+#define JPEG_OUT_HEIGHT 600
 
 inline void printMatrix(const kn::Matrix<double> & m) {
 	for(size_t r = 0; r < m.rows(); ++r) {
@@ -33,6 +33,7 @@ inline void printVector(const kn::Vector<double> & v, bool in_line = false) {
 			std::cout << " |\t" << v[c] << "\t|" << std::endl;
 }
 
+// @FIXME
 inline void printPointsMapJpeg(const std::vector<kn::Vectord> & outputPoints, std::vector<Image*> & imgs) {
 	kn::ImageRGB<unsigned char> img(JPEG_OUT_WIDTH, JPEG_OUT_HEIGHT);
 	img.fill(255);

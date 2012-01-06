@@ -1,4 +1,5 @@
 #include "Maths.hpp"
+#include "Print.hpp"
 
 void nonLinearSystemSolver(
 	kn::Vector<double> &a,
@@ -94,20 +95,20 @@ double f(kn::Vector<double> & a, const kn::Vector<double> & b, const std::vector
 }
 
 kn::Vector4d resolvePointTriangulation(const size_t iPoint, const std::vector<Image*> & imgs) {
-	kn::Vector3d point;
-	kn::Matrixd projection;
 	kn::Matrixd bigProjection(4,4);
-	kn::Vectord result;
+	kn::Vector<double> result(4);
+	result.setZero();
 	
 	// triangulation
 	// @TODO : more than 2 images ?
 	for(size_t i = 0 ; i < 2 /*imgs.size()*/ ; ++i) {
-		point = imgs[i]->points[iPoint];
-		projection = imgs[i]->pCamera->projection;
-		bigProjection.setRow(i*2, point[1] * projection.getRow(0) - point[2] * projection.getRow(1));
+		kn::Vector3d point = imgs[i]->points[iPoint];
+		kn::Matrixd projection = imgs[i]->pCamera->projection;
+		bigProjection.setRow(i*2, 	point[1] * projection.getRow(2) - point[2] * projection.getRow(1));
 		bigProjection.setRow(i*2+1, point[2] * projection.getRow(0) - point[0] * projection.getRow(2));
 	}
 	
-	solveNullSystemSVD(bigProjection, result);
-	return (kn::Vector4d)result;
+	kn::solveNullSystemSVD(bigProjection, result);
+	result /= result[3]; // We want the last coordinate to be 1
+	return result;
 }

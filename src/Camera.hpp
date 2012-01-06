@@ -26,7 +26,6 @@ struct Camera {
 	virtual kn::Matrix3x3d computeHomographyFromRotation(const kn::Matrix3x3d & rot);
 	// transfom the coordinates of a point with the projection of the camera
 	virtual kn::Vector3d project(const kn::Vector4d & point3d);
-	virtual kn::Vector4d findOrigin(const kn::Vector3d & point2d);
 	virtual void computeProjection();
 	
 	// We can add here functions for computing other Camera's attributes
