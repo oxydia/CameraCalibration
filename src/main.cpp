@@ -168,9 +168,6 @@ int main(int argc, char** argv) {
 		cout << "Image " << i+1 << " - Camera - Transformation (rotation) parameter : " << endl << img.pCamera->rotation << endl;
 		
 		// Reset center.
-		/*kn::Vector3d oldPosition;
-		oldPosition.setZero();
-		oldPosition[0] = i;*/
 		img.pCamera->center = - img.pCamera->rotation * img.pCamera->position;
 		
 		// Find the actual homography of the camera.
@@ -215,10 +212,10 @@ void printPointsMapJpeg(const std::vector<kn::Vectord> & outputPoints, std::vect
 	
 	// @FIXME
 	for(size_t i = 0; i < outputPoints.size(); ++i)
-		kn::drawCircle(img, outputPoints[i][0] * 100 + JPEG_OUT_WIDTH / 2, outputPoints[i][2] * 100 + JPEG_OUT_HEIGHT / 2 + 100, 4, 0, 0, 255);
+		kn::drawCircle(img, outputPoints[i][0] + JPEG_OUT_WIDTH / 2, outputPoints[i][2]  + JPEG_OUT_HEIGHT / 2 - 300, 4, 0, 0, 255);
 
 	for(size_t i = 0; i < imgs.size(); ++i)
-		kn::drawCircle(img, imgs[i]->pCamera->center[0] * 100 + JPEG_OUT_WIDTH / 2, imgs[i]->pCamera->center[2] * 100 + JPEG_OUT_HEIGHT / 2 + 100, 4, 255, 0, 0);
+		kn::drawCircle(img, imgs[i]->pCamera->center[0] * 100 + JPEG_OUT_WIDTH / 2, imgs[i]->pCamera->center[2]*100 + JPEG_OUT_HEIGHT / 2, 4, 255, 0, 0);
 
 	if (!kn::saveJPG(img, "./out/points_map.jpg", 100))
 		std::cerr << "Saving impossible !" << std::endl;

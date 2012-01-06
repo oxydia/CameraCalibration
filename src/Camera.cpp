@@ -36,7 +36,7 @@ Matrix<double> Camera::extrinsecParameters() {
 	for(size_t i = 0; i < 3; ++i)
 		for(size_t j=0; j < 3; ++j)
 			eP[i][j] = rotation[i][j];
-	Vector3d newCenter = - rotation * center;
+	Vector3d newCenter = - rotation * position;
 	eP[0][3] = newCenter[0];
 	eP[1][3] = newCenter[1];
 	eP[2][3] = newCenter[2];
