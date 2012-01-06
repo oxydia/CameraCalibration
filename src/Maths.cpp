@@ -11,6 +11,7 @@ void nonLinearSystemSolver(
 	kn::Vectord jacobianVector = _nonLinearSystemSolverJacobian(a, b, pF, imgs);
 	// jBase is the jacobianVector converted into a matrix.
 	kn::Matrixd j(1, a.size(), jacobianVector, true), jT = j;
+	kn::Matrixd identity(a.size(), a.size());
 	jT.transpose();
 	kn::Matrixd jTj = jT * j;
 	
@@ -31,10 +32,9 @@ void nonLinearSystemSolver(
 		size_t cpt = 0;
 		bool accepted = false;
 		do {
-			kn::Matrix<double> identity(a.size(), a.size());
-			identity.setIdentity();
 			kn::Matrix<double> aSystem;
 			kn::Vector<double> step_a(a.size(), 0.), bSystem;
+			identity.setIdentity();
 			aSystem = jT * j + alpha * identity;
 			bSystem = - jacobianVector * f(a, b, imgs);
 			
@@ -62,33 +62,41 @@ kn::Vector<double> _nonLinearSystemSolverJacobian(
 	double (*pF)(kn::Vector<double>&, const kn::Vector<double>&, const std::vector<Image*> &),
 	const std::vector<Image*> & imgs)
 {
-	kn::Vector<double> vectorJacobi(a.size());
-	kn::Vector<double> aJ;
+	kn::Vector<double> jacob(a.size());
 	// partial derivation
 	for(size_t j = 0; j < a.size(); ++j) {
-		aJ = a;
+		kn::Vectord aJ = a;
 		double delta_aj = std::max(std::min(a[j]*std::pow(10, -4), std::pow(10, -6)), std::pow(10, -15));
 		aJ[j] += delta_aj;
-		vectorJacobi[j] = ( pF(aJ, b, imgs) - pF(a, b, imgs) ) / delta_aj;
+		jacob[j] = ( pF(aJ, b, imgs) - pF(a, b, imgs) ) / delta_aj;
 	}
 	// we return a matrix 1,n (a vector)
-	return vectorJacobi;
+	return jacob;
 }
 
+
+// @TODO : What if more than 2 images.
 double f(kn::Vector<double> & a, const kn::Vector<double> & b, const std::vector<Image*> & imgs) {
-	double res(0), proj1x1Y(0), proj2x2Y(0);
+	double res(0);
+	kn::Vector3d proj1x1Y, proj2x2Y;
+	proj1x1Y.setZero();
+	proj2x2Y.setZero();
 	kn::Vector3d point1;
 	kn::Vector3d point2;
 	if(imgs.size() != 2) {
 		std::cerr << "You need to select only 2 images !" << std::endl;
 		exit(1);
 	}
-	kn::Matrix3x3d rotationCam1 = imgs[0]->pCamera->computeHomographyFromRotation(kn::eulerAngles3x3d(a[0], a[1], a[2]));
-	kn::Matrix3x3d rotationCam2 = imgs[1]->pCamera->computeHomographyFromRotation(kn::eulerAngles3x3d(a[3], a[4], a[5]));
+	kn::Matrix3x3d homoRotationCam1 = imgs[0]->pCamera->computeHomographyFromRotation(kn::eulerAngles3x3d(0., a[1], a[2]));
+	kn::Matrix3x3d homoRotationCam2 = imgs[1]->pCamera->computeHomographyFromRotation(kn::eulerAngles3x3d(a[3], a[4], a[5]));
 	for(size_t i = 0; i < b[3]; ++i) {
-		proj1x1Y = (rotationCam1 * kn::Vector3d(b[4+4*i],b[4+4*i+1],1.))[1];
-		proj2x2Y = (rotationCam2 * kn::Vector3d(b[4+4*i+2],b[4+4*i+3],1.))[1];
-		res += pow(proj1x1Y - proj2x2Y, 2);
+		proj1x1Y = homoRotationCam1 * kn::Vector3d(b[4+4*i],b[4+4*i+1],1.);
+		proj2x2Y = homoRotationCam2 * kn::Vector3d(b[4+4*i+2],b[4+4*i+3],1.);
+		// Reset vectors scale
+		proj1x1Y /= (proj1x1Y[2] != 0) ? proj1x1Y[2] : 1;
+		proj2x2Y /= (proj2x2Y[2] != 0) ? proj2x2Y[2] : 1;
+		// Computing disparities of axis y only
+		res += pow(proj1x1Y[1] - proj2x2Y[1], 2);
 	}
 	return res;
 }
