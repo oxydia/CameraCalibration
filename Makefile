@@ -5,10 +5,11 @@ EXE = calibration
 
 
 $(EXE) : $(SRCDIR)/* $(SRCDIR)/Print.hpp
+	@mkdir ./out
 	@echo "Generating executable, this may take a while."
 	@$(GXX) $^ $(FLAGS) -o $(EXE)
 	@echo "Executable generated successfully."
-	@echo "Wanna launch it ? Just type './calibration' without argument for help."
+	@echo "Wanna launch it ? Just type './calibration -h' for help."
 
  
 .PHONY : clean ultraclean fresh
